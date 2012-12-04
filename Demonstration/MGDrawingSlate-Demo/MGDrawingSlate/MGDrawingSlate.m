@@ -52,10 +52,17 @@
     return self;
 }
 
+#pragma mark - Edit 
+-(void)undoStroke{
+    if (drawingPaths.count>0) {
+        [drawingPaths removeLastObject];
+        [self setNeedsDisplay];
+    }
+}
+
 #pragma mark - Drawing Methods
 - (void)drawRect:(CGRect)rect
 {
-    
     [self.lineColor setStroke];
     for (UIBezierPath *path in drawingPaths) {
         [path strokeWithBlendMode:kCGBlendModeNormal alpha:1.0];

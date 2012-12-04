@@ -17,4 +17,5 @@
 @property (nonatomic, assign) NSInteger lineWeight;
 @property (nonatomic, strong) UIColor *lineColor;
 
+-(void)undoStroke;
 @end

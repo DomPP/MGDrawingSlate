@@ -21,5 +21,5 @@
 - (IBAction)clearSlate:(id)sender;
 - (IBAction)saveImage:(id)sender;
 - (IBAction)showInfo:(id)sender;
-
+- (IBAction)undo;
 @end

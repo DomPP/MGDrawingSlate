@@ -37,6 +37,9 @@ CGRect placeholderFrame; //Stores placeholder
 }
 
 #pragma mark - Demonstration App Methods
+- (IBAction)undo{
+    [drawingSlate undoStroke];
+}
 
 // Present color picker - only for demonsration app
 - (IBAction)changeColor:(id)sender {

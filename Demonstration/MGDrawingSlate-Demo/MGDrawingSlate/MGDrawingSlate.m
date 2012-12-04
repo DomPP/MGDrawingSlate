@@ -9,70 +9,89 @@
 
 #import "MGDrawingSlate.h"
 
+@interface MGDrawingSlate (){
+    NSMutableArray *drawingPaths;
+    UIBezierPath *currentDrawingPath;
+    BOOL isDrawing;
+}
+
+- (void)commonInit;
+
+@end
+
 @implementation MGDrawingSlate
 
 #pragma mark - Initialization
+- (void)commonInit{
+    //Initialize MGDrawingSlate and set default values
+    self.backgroundColor = [UIColor clearColor];
+    
+    self.lineWeight = 4; //Default line weight - change with changeLineWeightTo: method.
+    self.lineColor = [UIColor blackColor]; //Default color - change with changeColorTo: method.
+    drawingPaths = [NSMutableArray array];
+    isDrawing = NO;
+    
+}
 
 - (id)initWithFrame:(CGRect)frame
 {
     
     self = [super initWithFrame:frame];
     if (self) {
-        
-        //Initialize MGDrawingSlate and set default values
-        self.backgroundColor = [UIColor whiteColor];
-        drawingPath = [[UIBezierPath alloc]init];
-        drawingPath.lineCapStyle = kCGLineCapRound;
-        drawingPath.miterLimit = 0;
-        drawingPath.lineWidth = 4; //Default line weight - change with changeLineWeightTo: method.
-        drawingColor = [UIColor blackColor]; //Default color - change with changeColorTo: method.
-        
+        [self commonInit];
     }
     return self;
     
 }
 
-#pragma mark - Customization Methods
-
-//Call from view controller to change the line weight of the drawing path. Alternatively, just change [drawingSlate]->drawingPath.lineWidth.
-- (void)changeLineWeightTo:(NSInteger)weight {
-    
-    drawingPath.lineWidth = weight;
-    
-}
-
-//Call from view controller to change the color of the drawing path. Alternatively, just change [drawingSlate]->drawingColor.
-- (void)changeColorTo:(UIColor *)color {
-    
-    drawingColor = color;
-    
+-(id)initWithCoder:(NSCoder *)aDecoder{
+    self = [super initWithCoder:aDecoder];
+    if (self) {
+        [self commonInit];
+    }
+    return self;
 }
 
 #pragma mark - Drawing Methods
-
 - (void)drawRect:(CGRect)rect
 {
     
-    [drawingColor setStroke];
-    [drawingPath strokeWithBlendMode:kCGBlendModeNormal alpha:1.0];
-    
+    [self.lineColor setStroke];
+    for (UIBezierPath *path in drawingPaths) {
+        [path strokeWithBlendMode:kCGBlendModeNormal alpha:1.0];
+    }
 }
 
 -(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
 {
     
-    UITouch *touch = [[touches allObjects] objectAtIndex:0];
-    [drawingPath moveToPoint:[touch locationInView:self]];
+    UITouch *touch = [[touches allObjects] objectAtIndex:0];    
+    currentDrawingPath = [[UIBezierPath alloc] init];
+    currentDrawingPath.lineCapStyle = kCGLineCapRound;
+    currentDrawingPath.miterLimit = 0;
+    currentDrawingPath.lineWidth = self.lineWeight;
+    [currentDrawingPath moveToPoint:[touch locationInView:self]];
     
 }
 
 -(void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
 {
+    if(!isDrawing){
+        [drawingPaths addObject:currentDrawingPath];
+        isDrawing = YES;
+    }
     
     UITouch *touch = [[touches allObjects] objectAtIndex:0];
-    [drawingPath addLineToPoint:[touch locationInView:self]];
+    UIBezierPath *lastDrawingPath = [drawingPaths objectAtIndex:drawingPaths.count-1];
+    [lastDrawingPath addLineToPoint:[touch locationInView:self]];
     [self setNeedsDisplay];
     
+}
+
+-(void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event{
+    NSLog(@"Paths: %i",drawingPaths.count);
+    currentDrawingPath = nil;
+    isDrawing = NO;
 }
 
 @end

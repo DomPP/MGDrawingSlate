@@ -11,12 +11,10 @@
 
 @interface MGDrawingSlate : UIView {
 
-    @public UIBezierPath *drawingPath;
-    @public UIColor *drawingColor;
-
 }
 
-- (void)changeLineWeightTo:(NSInteger)weight;
-- (void)changeColorTo:(UIColor *)color;
+@property (nonatomic, readonly) NSArray *paths;
+@property (nonatomic, assign) NSInteger lineWeight;
+@property (nonatomic, strong) UIColor *lineColor;
 
 @end

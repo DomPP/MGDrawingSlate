@@ -43,7 +43,7 @@ CGRect placeholderFrame; //Stores placeholder
     
     InfColorPickerController *colorPicker = [InfColorPickerController colorPickerViewController];
     
-    colorPicker.sourceColor = drawingSlate->drawingColor;
+    colorPicker.sourceColor = drawingSlate.lineColor;
     colorPicker.delegate = self;
     
     [colorPicker presentModallyOverViewController:self];
@@ -53,7 +53,7 @@ CGRect placeholderFrame; //Stores placeholder
 //Get new color specified by user and set it - only for demonstration app
 - (void) colorPickerControllerDidFinish: (InfColorPickerController*) colorPicker {
     
-    [drawingSlate changeColorTo:colorPicker.resultColor];
+    drawingSlate.lineColor = colorPicker.resultColor;
 
     [self dismissModalViewControllerAnimated:YES];
     
@@ -67,7 +67,7 @@ CGRect placeholderFrame; //Stores placeholder
     
     [[changeWeight textFieldAtIndex:0] setPlaceholder:@"Line Weight"];
     [[changeWeight textFieldAtIndex:0] setKeyboardType:UIKeyboardTypeNumberPad];
-    [[changeWeight textFieldAtIndex:0] setText:[NSString stringWithFormat:@"%d",(int)drawingSlate->drawingPath.lineWidth]];
+    [[changeWeight textFieldAtIndex:0] setText:[NSString stringWithFormat:@"%d",drawingSlate.lineWeight]];
     
     [changeWeight show];
     
@@ -79,7 +79,7 @@ CGRect placeholderFrame; //Stores placeholder
     if(buttonIndex != alertView.cancelButtonIndex) {
         
         NSString *newWeightString = [[alertView textFieldAtIndex:0] text];
-        [drawingSlate changeLineWeightTo:[newWeightString integerValue]];
+        drawingSlate.lineWeight = [newWeightString integerValue];
         
     }
     
@@ -89,23 +89,23 @@ CGRect placeholderFrame; //Stores placeholder
 - (IBAction)clearSlate:(id)sender {
     
     //Capture current settings of the MGDrawingSlate in order to restore them back later
-    NSInteger drawingWeight = (int)drawingSlate->drawingPath.lineWidth;
-    UIColor *drawingColor = drawingSlate->drawingColor;
+    NSInteger drawingWeight = drawingSlate.lineWeight;
+    UIColor *drawingColor = drawingSlate.lineColor;
     
     [drawingSlate removeFromSuperview]; //Remove old MGDrawingSlate
     
     //Create new MGDrawingSlate and restore the settings
     drawingSlate = [[MGDrawingSlate alloc] initWithFrame:placeholderFrame];
     [self.view addSubview:drawingSlate];
-    [drawingSlate changeLineWeightTo:drawingWeight];
-    [drawingSlate changeColorTo:drawingColor];
+    drawingSlate.lineWeight = drawingWeight;
+    drawingSlate.lineColor = drawingColor;
     
 }
 
 //Save drawing to camera roll - only for demonstration app
 - (IBAction)saveImage:(id)sender {
     
-    UIGraphicsBeginImageContextWithOptions(drawingSlate.bounds.size, drawingSlate.opaque, 0.0);
+    UIGraphicsBeginImageContextWithOptions(drawingSlate.bounds.size, NO, 0.0);
     [drawingSlate.layer renderInContext:UIGraphicsGetCurrentContext()];
     UIImage * img = UIGraphicsGetImageFromCurrentImageContext();
     UIGraphicsEndImageContext();
